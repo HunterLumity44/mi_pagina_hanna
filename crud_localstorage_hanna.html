@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD con LocalStorage</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background-color: #f0f8ff; }
+    input, button { margin: 5px; padding: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #e0f0ff; }
+  </style>
+</head>
+<body>
+  <h1>CRUD con LocalStorage</h1>
+  <form id="form">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="date" id="fecha" required>
+    <input type="color" id="color" title="Color favorito" required>
+    <button type="submit">Agregar</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Fecha</th>
+        <th>Color</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tabla"></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('form');
+    const tabla = document.getElementById('tabla');
+    let datos = JSON.parse(localStorage.getItem('datos')) || [];
+
+    function renderTabla() {
+      tabla.innerHTML = '';
+      datos.forEach((item, index) => {
+        const row = `<tr>
+          <td>${item.nombre}</td>
+          <td>${item.fecha}</td>
+          <td><div style="width:20px; height:20px; background:${item.color}; margin:auto;"></div></td>
+          <td>
+            <button onclick="editar(${index})">Editar</button>
+            <button onclick="eliminar(${index})">Eliminar</button>
+          </td>
+        </tr>`;
+        tabla.innerHTML += row;
+      });
+      localStorage.setItem('datos', JSON.stringify(datos));
+    }
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value;
+      const fecha = document.getElementById('fecha').value;
+      const color = document.getElementById('color').value;
+      datos.push({ nombre, fecha, color });
+      form.reset();
+      renderTabla();
+    };
+
+    function eliminar(index) {
+      datos.splice(index, 1);
+      renderTabla();
+    }
+
+    function editar(index) {
+      const item = datos[index];
+      document.getElementById('nombre').value = item.nombre;
+      document.getElementById('fecha').value = item.fecha;
+      document.getElementById('color').value = item.color;
+      datos.splice(index, 1);
+      renderTabla();
+    }
+
+    renderTabla();
+  </script>
+</body>
+</html>
